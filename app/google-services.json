@@ -12,7 +12,16 @@
           "package_name": "com.example.task_manager"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "185630036316-ij5rp30mdkmvc3d2iaabdohbbgmn6hf8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.task_manager",
+            "certificate_hash": "ce0cb037794f7c95763a88e7605a8500b9604243"
+          }
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCz3WYIQs1KnCc_6vWe16vx5neXYxcXW1w"
