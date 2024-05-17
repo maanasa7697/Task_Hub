@@ -20,6 +20,10 @@
             "package_name": "com.example.task_manager",
             "certificate_hash": "ce0cb037794f7c95763a88e7605a8500b9604243"
           }
+        },
+        {
+          "client_id": "185630036316-2dp01nuf8tlcf6ogl0htp2hv8sevqupr.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -29,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185630036316-2dp01nuf8tlcf6ogl0htp2hv8sevqupr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
