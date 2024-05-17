@@ -4,4 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bg">#F6F5EF</color>
     <color name="theme">#006241</color>
+    <color name="pending">#FFD700</color>
+    <color name="completed">#32CD32</color>
+    <color name="not_started">#FF6347</color>
 </resources>

@@ -49,5 +49,5 @@ dependencies {
 
     // Also add the dependency for the Google Play services library and specify its version
     implementation("com.google.android.gms:play-services-auth:21.1.1")
-
+    implementation("com.google.android.material:material:1.13.0-alpha02")
 }

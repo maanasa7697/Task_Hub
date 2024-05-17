@@ -1,24 +1,41 @@
 package com.example.task_manager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.task_manager.model.TaskModel;
+
+import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
+
+    private RecyclerView taskRv;
+    private ArrayList<TaskModel> dataList = new ArrayList<>();
+    private TaskListAdapter taskListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        taskRv = findViewById(R.id.taskListRv);
+        dataList.add(new TaskModel("testId", "demo task", "pending"));
+        dataList.add(new TaskModel("Id", "shopping", "pending"));
+        dataList.add(new TaskModel("Id2", "reading", "completed"));
+
+        taskListAdapter = new TaskListAdapter(dataList);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        taskRv.setLayoutManager(layoutManager);
+        taskRv.setAdapter(taskListAdapter);
+
+        findViewById(R.id.addTaskFAB).setOnClickListener(view -> {
+            Intent intent = new Intent(HomeActivity.this, AddTaskActivity.class);
+            startActivity(intent);
         });
     }
 }
