@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,8 +19,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -27,6 +32,8 @@ public class HomeActivity extends AppCompatActivity {
     private TaskListAdapter taskListAdapter;
     FirebaseFirestore db;
     String TAG="Homepage";
+    TextView userNametv;
+    CircleImageView userProfileIv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +42,10 @@ public class HomeActivity extends AppCompatActivity {
 
         taskRv = findViewById(R.id.taskListRv);
         db = FirebaseFirestore.getInstance();
-
-
+        userNametv=findViewById(R.id.userNametv);
+        userProfileIv=findViewById(R.id.userProfileIv);
+        userNametv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        Picasso.get().load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl()).into(userProfileIv);
 
         taskListAdapter = new TaskListAdapter(dataList);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);

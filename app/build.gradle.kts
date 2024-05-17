@@ -49,6 +49,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation ("com.google.android.gms:play-services-auth:20.0.0")
     implementation ("com.google.firebase:firebase-auth:21.0.6")
+    implementation ("com.squareup.picasso:picasso:2.8")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
 
     // Also add the dependency for the Google Play services library and specify its version
     implementation("com.google.android.gms:play-services-auth:21.1.1")

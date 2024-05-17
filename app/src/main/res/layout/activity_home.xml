@@ -34,17 +34,21 @@
                 <TextView
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Maanasa Ramakrishnan"
+                    android:text="sample name"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:id="@+id/userNametv"
+                    />
             </LinearLayout>
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="50dp"
                 android:layout_height="45dp"
                 android:src="@drawable/dummy"
-                android:layout_gravity="end" />
+                android:layout_gravity="end"
+                android:id="@+id/userProfileIv"
+                />
         </LinearLayout>
 
         <SearchView
