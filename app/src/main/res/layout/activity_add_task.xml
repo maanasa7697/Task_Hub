@@ -12,13 +12,22 @@
       android:id="@+id/textField"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-       android:hint="Add Task">
+      android:hint="Add Task"
+      android:padding="10dp"
+      >
 
     <com.google.android.material.textfield.TextInputEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/inputTaskName"
         />
-
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/taskSave"
+        android:text="Save Task"
+        android:backgroundTint="@color/theme"
+        />
   </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>
