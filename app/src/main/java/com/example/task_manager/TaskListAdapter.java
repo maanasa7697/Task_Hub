@@ -1,6 +1,7 @@
 package com.example.task_manager;
 
 
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
@@ -29,17 +30,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
      * (custom ViewHolder)
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout containerLL;
+        CardView cardView;
 
         private final TextView taskNameTv,taskStatusTv;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
+            cardView = (CardView)view.findViewById(R.id.containerLL);
 
             taskNameTv = (TextView) view.findViewById(R.id.taskNameTv);
             taskStatusTv = (TextView) view.findViewById(R.id.taskStatusTv);
-            containerLL=(LinearLayout)view.findViewById(R.id.containerLL);
+
 
         }
 
@@ -77,10 +79,10 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         else{
             viewHolder.taskStatusTv.setBackgroundColor(Color.parseColor("#FF6347"));
         }
-        viewHolder.containerLL.setOnLongClickListener(new View.OnLongClickListener() {
+        viewHolder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                PopupMenu popupMenu=new PopupMenu(view.getContext(),viewHolder.containerLL);
+                PopupMenu popupMenu=new PopupMenu(view.getContext(),viewHolder.cardView);
                 popupMenu.inflate(R.menu.taskmenu);
                 popupMenu.show();
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -92,7 +94,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
                                         @Override
                                         public void onSuccess(Void unused) {
                                             Toast.makeText(view.getContext(),"Task Deleted Successfully!!",Toast.LENGTH_SHORT).show();
-                                            viewHolder.containerLL.setVisibility(View.GONE);
+                                            viewHolder.cardView.setVisibility(View.GONE);
                                         }
                                     });
                         }
