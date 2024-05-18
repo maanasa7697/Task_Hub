@@ -65,7 +65,10 @@ public class HomeActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
+
                                 TaskModel taskModel=document.toObject(TaskModel.class);
+
+                                taskModel.setTaskId(document.getId());
                                 dataList.add(taskModel);
                                 taskListAdapter.notifyDataSetChanged();
                             }
