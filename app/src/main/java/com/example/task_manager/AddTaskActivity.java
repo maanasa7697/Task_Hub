@@ -18,13 +18,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 
 import com.example.task_manager.model.TaskModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
@@ -47,9 +45,9 @@ public class AddTaskActivity extends AppCompatActivity {
 
         selectedDateTextView = findViewById(R.id.selectedDateTextView);
         selectedTimeTextView = findViewById(R.id.selectedTimeTextView);
-        dayTextView = findViewById(R.id.day);
-        monthTextView = findViewById(R.id.month);
-        dateTextView = findViewById(R.id.date);
+        dayTextView = findViewById(R.id.dayTextView);
+        monthTextView = findViewById(R.id.monthTextView);
+        dateTextView = findViewById(R.id.dateTextView);
 
         etTaskInput = findViewById(R.id.inputTaskName);
         saveBtn = findViewById(R.id.taskSave);
@@ -63,9 +61,13 @@ public class AddTaskActivity extends AppCompatActivity {
 
         saveBtn.setOnClickListener(v -> {
             String taskName = etTaskInput.getText().toString().trim();
+            String Day = dayTextView.getText().toString().trim();
+            String Month = monthTextView.getText().toString().trim();
+            String Date = dateTextView.getText().toString().trim();
+
             if (!taskName.isEmpty()) {
                 // Create TaskModel instance with selected date and time
-                TaskModel taskModel = new TaskModel("", taskName, "PENDING", FirebaseAuth.getInstance().getUid(), calendar.getTime(), selectedTimeTextView.getText().toString());
+                TaskModel taskModel = new TaskModel("", taskName, "PENDING", FirebaseAuth.getInstance().getUid(), calendar.getTime(), selectedTimeTextView.getText().toString(),Date,Day,Month);
                 saveTaskToFirebase(taskModel);
             } else {
                 Toast.makeText(AddTaskActivity.this, "Please enter a task name", Toast.LENGTH_SHORT).show();
