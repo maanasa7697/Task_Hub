@@ -1,14 +1,13 @@
 package com.example.task_manager;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -52,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
                 signIn();
             }
         });
+        TextView textView = findViewById(R.id.email);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MyBottomSheetDialogFragment bottomSheet = new MyBottomSheetDialogFragment();
+                bottomSheet.show(getSupportFragmentManager(), bottomSheet.getTag());
+            }
+        });
     }
 
     @Override
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            showContinueDialog(currentUser);
+            updateUI(currentUser);
         }
     }
 
@@ -111,29 +118,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "No user is signed in");
         }
-    }
-
-    private void showContinueDialog(FirebaseUser currentUser) {
-        new AlertDialog.Builder(this)
-                .setTitle("Continue with your account?")
-                .setMessage("Is it okay to continue with " + currentUser.getEmail() + " or do you want to sign in with a different account?")
-                .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        updateUI(currentUser);
-                    }
-                })
-                .setNegativeButton("Sign in with different account", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        mAuth.signOut();
-                        mGoogleSignInClient.signOut().addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                // User signed out
-                            }
-                        });
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
     }
 }

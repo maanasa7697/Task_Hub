@@ -45,7 +45,7 @@
             <de.hdodenhof.circleimageview.CircleImageView
                 android:layout_width="50dp"
                 android:layout_height="45dp"
-                android:src="@drawable/dummy"
+                android:src="@drawable/default"
                 android:layout_gravity="end"
                 android:id="@+id/userProfileIv"
                 />
@@ -65,6 +65,7 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addTaskFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_add_task_24"
@@ -72,7 +73,6 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="20dp"
-        app:shapeAppearance="@style/Widget.Material3.CircularProgressIndicator.Medium"
-        app:backgroundTint="@color/theme"
-        android:id="@+id/addTaskFAB" />
+        app:fabSize="auto"
+        android:background="@drawable/fab_ripple" />
 </RelativeLayout>

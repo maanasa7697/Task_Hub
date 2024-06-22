@@ -46,11 +46,13 @@ dependencies {
     implementation("androidx.multidex:multidex:2.0.1")
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-auth")
+    implementation ("com.google.firebase:firebase-auth")
     implementation ("com.google.android.gms:play-services-auth:20.0.0")
     implementation ("com.google.firebase:firebase-auth:21.0.6")
     implementation ("com.squareup.picasso:picasso:2.8")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("androidx.constraintlayout:constraintlayout:2.0.2")
+    implementation ("com.google.android.material:material:1.8.0")
 
     // Also add the dependency for the Google Play services library and specify its version
     implementation("com.google.android.gms:play-services-auth:21.1.1")

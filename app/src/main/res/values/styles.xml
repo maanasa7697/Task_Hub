@@ -1,0 +1,29 @@
+<resources>
+    <!-- Base application theme -->
+    <style name="Theme.MyApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Customize your theme here -->
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryVariant">@color/primaryVariant</item>
+        <item name="colorOnPrimary">@color/onPrimary</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
+        <item name="colorSecondaryVariant">@color/secondaryVariant</item>
+        <item name="colorOnSecondary">@color/onSecondary</item>
+    </style>
+
+    <!-- Text appearance for bottom sheet title -->
+    <style name="TextAppearance.MyApp.BottomSheetTitle" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/primaryColor</item>
+    </style>
+
+    <!-- Style for input fields -->
+    <style name="Widget.MyApp.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primaryColor</item>
+        <item name="hintTextColor">@color/primaryColor</item>
+    </style>
+
+    <!-- Style for buttons -->
+    <style name="Widget.MyApp.Button" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:backgroundTint">@color/primaryColor</item>
+        <item name="android:textColor">@color/onPrimary</item>
+    </style>
+</resources>

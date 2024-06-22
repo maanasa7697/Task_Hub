@@ -7,4 +7,11 @@
     <color name="pending">#FFD700</color>
     <color name="completed">#32CD32</color>
     <color name="not_started">#FF6347</color>
+    <color name="primaryColor">#006241</color>
+    <color name="primaryDarkColor">#00492F</color>
+    <color name="primaryVariant">#003D26</color>
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="secondaryColor">#FFC107</color>
+    <color name="secondaryVariant">#FFA000</color>
+    <color name="onSecondary">#000000</color>
 </resources>
