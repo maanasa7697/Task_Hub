@@ -1,7 +1,9 @@
 package com.example.task_manager;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -21,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.task_manager.model.TaskModel;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -67,7 +68,7 @@ public class AddTaskActivity extends AppCompatActivity {
 
             if (!taskName.isEmpty()) {
                 // Create TaskModel instance with selected date and time
-                TaskModel taskModel = new TaskModel("", taskName, "PENDING", FirebaseAuth.getInstance().getUid(), calendar.getTime(), selectedTimeTextView.getText().toString(),Date,Day,Month);
+                TaskModel taskModel = new TaskModel("", taskName, "PENDING", FirebaseAuth.getInstance().getUid(), calendar.getTime(), selectedTimeTextView.getText().toString(), Date, Day, Month);
                 saveTaskToFirebase(taskModel);
             } else {
                 Toast.makeText(AddTaskActivity.this, "Please enter a task name", Toast.LENGTH_SHORT).show();
@@ -123,23 +124,18 @@ public class AddTaskActivity extends AppCompatActivity {
         // Add task to Firestore
         db.collection("tasks").add(taskModel).addOnSuccessListener(documentReference -> {
             // Task added successfully
-            showSuccessAnimation();
-            Toast.makeText(AddTaskActivity.this, "Task added successfully", Toast.LENGTH_SHORT).show();
+            taskModel.setTaskId(documentReference.getId()); // Set the generated task ID
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("newTask", taskModel); // Pass the new task data
+            setResult(Activity.RESULT_OK, resultIntent); // Set result to OK
+            findViewById(R.id.progress).setVisibility(View.GONE);
+            finish(); // Close AddTaskActivity
         }).addOnFailureListener(e -> {
             // Error adding task
             Toast.makeText(AddTaskActivity.this, "Failed to add task", Toast.LENGTH_SHORT).show();
             findViewById(R.id.progress).setVisibility(View.GONE);
             Log.e(TAG, "Error adding task", e);
         });
-    }
-
-    private void showSuccessAnimation() {
-        View successLayout = findViewById(R.id.success);
-        Animation fadeInSlideUp = AnimationUtils.loadAnimation(this, R.anim.fade_in_slide_up);
-        successLayout.setVisibility(View.VISIBLE);
-        successLayout.startAnimation(fadeInSlideUp);
-        findViewById(R.id.addTaskLayout).setVisibility(View.GONE);
-        findViewById(R.id.progress).setVisibility(View.GONE);
     }
 
     @Override

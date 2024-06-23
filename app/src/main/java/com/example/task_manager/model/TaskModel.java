@@ -1,8 +1,9 @@
 package com.example.task_manager.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TaskModel {
+public class TaskModel implements Serializable {
     String taskId, taskName, taskStatus, userId;
     Date taskDate;
     String taskTime;
