@@ -1,6 +1,5 @@
 package com.example.task_manager;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +24,6 @@ import com.bumptech.glide.Glide;
 import com.example.task_manager.model.TaskModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -95,10 +93,7 @@ public class HomeActivity extends AppCompatActivity implements TaskListAdapter.O
         fetchTasksFromFirestore();
 
         // Handle Floating Action Button click
-        FloatingActionButton fab = findViewById(R.id.addTaskFAB);
-        Animation pulseAnimation = AnimationUtils.loadAnimation(this, R.anim.fab_pulse);
-        fab.startAnimation(pulseAnimation);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.addTaskFAB).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivityForResult(new Intent(HomeActivity.this, AddTaskActivity.class), ADD_TASK_REQUEST);
@@ -150,14 +145,8 @@ public class HomeActivity extends AppCompatActivity implements TaskListAdapter.O
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_TASK_REQUEST && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                TaskModel newTask = (TaskModel) data.getSerializableExtra("newTask");
-                if (newTask != null) {
-                    dataList.add(newTask); // Add new task to the list
-                    taskListAdapter.notifyDataSetChanged(); // Notify adapter of the changes
-                }
-            }
+        if (requestCode == ADD_TASK_REQUEST && resultCode == RESULT_OK) {
+            fetchTasksFromFirestore(); // Refresh tasks after adding a new task
         }
     }
 
@@ -261,7 +250,10 @@ public class HomeActivity extends AppCompatActivity implements TaskListAdapter.O
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            taskListAdapter.notifyItemChanged(position); // Notify adapter of the change
+                            // Notify adapter only if the position is valid
+                            if (position < dataList.size()) {
+                                taskListAdapter.notifyItemChanged(position); // Notify adapter of the change
+                            }
                             Toast.makeText(HomeActivity.this, "Task marked as completed", Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(HomeActivity.this, "Error marking task as completed", Toast.LENGTH_SHORT).show();
@@ -279,9 +271,15 @@ public class HomeActivity extends AppCompatActivity implements TaskListAdapter.O
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            dataList.remove(position); // Remove task from the list
-                            taskListAdapter.notifyItemRemoved(position); // Notify adapter of the removal
+                            // Only remove the task if the position is still valid
+                            if (position < dataList.size()) {
+                                dataList.remove(position); // Remove task from the list
+                                taskListAdapter.notifyItemRemoved(position); // Notify adapter of the removal
+                            }
                             Toast.makeText(HomeActivity.this, "Task deleted", Toast.LENGTH_SHORT).show();
+
+                            // Refresh tasks after deletion
+                            fetchTasksFromFirestore();
                         } else {
                             Toast.makeText(HomeActivity.this, "Error deleting task", Toast.LENGTH_SHORT).show();
                         }
@@ -289,5 +287,3 @@ public class HomeActivity extends AppCompatActivity implements TaskListAdapter.O
                 });
     }
 }
-
-

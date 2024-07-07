@@ -1,9 +1,12 @@
 package com.example.task_manager;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -16,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class AddTaskActivity extends AppCompatActivity {
+public class AddTaskActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
 
     private static final int PERMISSION_REQUEST_CAMERA = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
@@ -129,14 +133,23 @@ public class AddTaskActivity extends AppCompatActivity {
     }
 
     private void showTimePickerDialog() {
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            calendar.set(Calendar.MINUTE, minute);
-
-            selectedTimeTextView.setText(String.format("%02d:%02d", hourOfDay, minute));
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, this,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true);
 
         timePickerDialog.show();
+    }
+
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
+
+        selectedTimeTextView.setText(String.format("%02d:%02d", hourOfDay, minute));
+
+        // Schedule notification 1 minute before the task time
+        scheduleNotification(calendar.getTimeInMillis() - 60000); // 1 minute before
     }
 
     private void capturePhoto() {
@@ -188,6 +201,14 @@ public class AddTaskActivity extends AppCompatActivity {
                     progressBar.setVisibility(View.GONE);
                     Log.e("AddTaskActivity", "Error adding task", e);
                 });
+    }
+
+    private void scheduleNotification(long timeInMillis) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, TaskReminderBroadcast.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
     }
 
     @Override

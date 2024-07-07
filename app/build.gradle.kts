@@ -57,5 +57,10 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     implementation("com.github.sundeepk:compact-calendar-view:3.0.0")
+    implementation("androidx.core:core:1.7.0")
+    implementation("androidx.work:work-runtime:2.7.1")
+
+
+
 }
 

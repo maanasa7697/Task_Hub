@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@color/material_dynamic_primary90"
+    android:background="@color/detail"
     tools:context=".TaskDetailActivity">
 
     <LinearLayout
@@ -21,8 +21,7 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:layout_marginBottom="8dp"
-            />
+            android:layout_marginBottom="8dp"/>
 
         <!-- Task Status -->
         <TextView
@@ -79,23 +78,32 @@
             android:textColor="@android:color/black"
             android:layout_marginBottom="8dp"/>
 
-        <!-- Captured Image -->
+        <!-- ImageView for Captured Image -->
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_corner"
-            android:clipToOutline="true"/>
-
-        <!-- Images Layout (if multiple images) -->
-        <LinearLayout
-            android:id="@+id/imagesLayout"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="16dp"/>
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/rounded_corner"
+            android:src="@drawable/placeholder_image"/>
 
+        <!-- Save to Internal Storage Button -->
+        <Button
+            android:id="@+id/saveToInternalStorageBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save to SD card"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Load from Internal Storage Button -->
+        <Button
+            android:id="@+id/loadFromInternalStorageBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Load from SD card"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"/>
     </LinearLayout>
 </ScrollView>

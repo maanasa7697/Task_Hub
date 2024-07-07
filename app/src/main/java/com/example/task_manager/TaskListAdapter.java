@@ -2,21 +2,14 @@ package com.example.task_manager;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.task_manager.model.TaskModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
@@ -68,7 +61,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.ViewHo
         viewHolder.taskMonthTextView.setText(task.getMonth());
 
         // Set background color based on task status
-        int backgroundColor = task.getTaskStatus().equalsIgnoreCase("COMPLETED") ? Color.GREEN : Color.YELLOW;
+        int backgroundColor = task.getTaskStatus().equalsIgnoreCase("Completed") ? Color.GREEN : Color.YELLOW;
         viewHolder.taskStatusTv.setBackgroundColor(backgroundColor);
 
         // Handle click on item to open detailed task page
