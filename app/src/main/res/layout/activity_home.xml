@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- User Info Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,36 +32,29 @@
                     android:text="Welcome Back!!" />
 
                 <TextView
+                    android:id="@+id/userNametv"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     android:text="sample name"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:textSize="20sp"
-                    android:id="@+id/userNametv"
-                    />
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/userProfileIv"
                 android:layout_width="50dp"
                 android:layout_height="45dp"
                 android:src="@drawable/profpic"
-                android:layout_gravity="end"
-                android:id="@+id/userProfileIv"
-                />
+                android:layout_gravity="end" />
         </LinearLayout>
 
-        <SearchView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:queryHint="Enter task name"
-            android:iconifiedByDefault="false"
-            android:layout_margin="7dp" />
-
+        <!-- RecyclerView for Task List -->
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/taskListRv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/taskListRv" />
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
     <!-- Progress bar -->
@@ -71,6 +65,21 @@
         android:layout_centerInParent="true"
         android:visibility="gone" />
 
+    <!-- Calendar GIF ImageView -->
+    <ImageView
+        android:id="@+id/gifImageView"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/addTaskFAB"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/calender_gif"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="navigateToCalendarActivity" />
+
+    <!-- Floating Action Button for Add Task -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addTaskFAB"
         android:layout_width="wrap_content"
@@ -78,8 +87,10 @@
         android:src="@drawable/baseline_add_task_24"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="25dp"
         android:layout_marginEnd="20dp"
+        app:shapeAppearance="@style/Widget.Material3.CircularProgressIndicator"
         app:fabSize="auto"
         android:background="@drawable/fab_ripple" />
+
 </RelativeLayout>

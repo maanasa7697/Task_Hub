@@ -20,9 +20,9 @@
         android:padding="10dp">
 
       <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/inputTaskName"
           android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:id="@+id/inputTaskName" />
+          android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
@@ -44,9 +44,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="horizontal"
-      android:gravity="center"
-      android:visibility="gone"
-      >
+      android:gravity="center">
 
     <TextView
         android:id="@+id/dayTextView"
@@ -70,32 +68,39 @@
         android:layout_margin="8dp" />
   </LinearLayout>
 
+  <Button
+      android:id="@+id/capturePhotoBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Capture Photo"
+      android:layout_gravity="center" />
+
   <LinearLayout
+      android:id="@+id/addTaskLayout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:orientation="vertical"
-      android:id="@+id/addTaskLayout">
+      android:orientation="vertical">
 
     <ProgressBar
+        android:id="@+id/progress"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:id="@+id/progress"
         android:visibility="gone" />
 
     <Button
+        android:id="@+id/taskSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/taskSave"
         android:text="Save Task"
         android:backgroundTint="@color/theme" />
   </LinearLayout>
 
   <LinearLayout
+      android:id="@+id/success"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:orientation="vertical"
-      android:id="@+id/success"
       android:gravity="center"
       android:background="@color/completed"
       android:visibility="gone"

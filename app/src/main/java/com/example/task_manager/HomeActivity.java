@@ -2,7 +2,6 @@ package com.example.task_manager;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -10,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.task_manager.model.TaskModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,7 +29,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
@@ -37,7 +40,7 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements TaskListAdapter.OnItemClickListener {
 
     private static final int ADD_TASK_REQUEST = 1;
     private RecyclerView taskRv;
@@ -49,10 +52,26 @@ public class HomeActivity extends AppCompatActivity {
     private CircleImageView userProfileIv;
     private ProgressBar progressBar;
 
+    private ImageView gifImageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        gifImageView = findViewById(R.id.gifImageView);
+        Glide.with(this)
+                .asGif()
+                .load(R.drawable.calender_gif)
+                .into(gifImageView);
+
+        // Set OnClickListener to navigate to CalendarActivity
+        gifImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigateToCalendarActivity();
+            }
+        });
 
         // Initialize Firebase
         db = FirebaseFirestore.getInstance();
@@ -64,10 +83,13 @@ public class HomeActivity extends AppCompatActivity {
 
         // Set up RecyclerView
         taskRv = findViewById(R.id.taskListRv);
-        taskListAdapter = new TaskListAdapter(dataList);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        taskListAdapter = new TaskListAdapter(dataList, this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         taskRv.setLayoutManager(layoutManager);
         taskRv.setAdapter(taskListAdapter);
+
+        // Fetch user profile information
+        updateUserProfile();
 
         // Fetch tasks from Firestore
         fetchTasksFromFirestore();
@@ -83,59 +105,58 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-        // Handle Profile Image click to show menu
-        userProfileIv.setOnClickListener(new View.OnClickListener() {
+        // Handle Profile Image long click to show logout menu
+        userProfileIv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                showPopupMenu(v);
+            public boolean onLongClick(View v) {
+                showLogoutMenu(v);
+                return true;
             }
         });
+    }
+
+    private void updateUserProfile() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // Set user's name
+            String name = user.getDisplayName();
+            if (name != null && !name.isEmpty()) {
+                userNametv.setText(name);
+            } else {
+                userNametv.setText("User");
+            }
+
+            // Set user's profile picture
+            String photoUrl = user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
+            if (photoUrl != null) {
+                Picasso.get().load(photoUrl).into(userProfileIv);
+            } else {
+                userProfileIv.setImageResource(R.drawable.profpic); // default image
+            }
+        }
+    }
+
+    private void navigateToCalendarActivity() {
+        Intent intent = new Intent(HomeActivity.this, CalendarActivity.class);
+        startActivity(intent);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateUserInfo(); // Update user information whenever activity resumes
+        fetchTasksFromFirestore(); // Update tasks on resume
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ADD_TASK_REQUEST && resultCode == Activity.RESULT_OK) {
-            fetchTasksFromFirestore(); // Refresh task list if task was added
-        }
-    }
-
-    // Method to update user information (name and profile picture)
-    private void updateUserInfo() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            if (user.getDisplayName() != null && user.getPhotoUrl() != null) {
-                // Use display name and profile picture from Firebase Authentication
-                userNametv.setText(user.getDisplayName());
-                Picasso.get().load(user.getPhotoUrl()).placeholder(R.drawable.profpic).into(userProfileIv);
-            } else {
-                // Fetch user name from Firestore and use default profile picture
-                db.collection("users").document(user.getUid()).get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        String userName = document.getString("name");
-                                        userNametv.setText(userName);
-                                        userProfileIv.setImageResource(R.drawable.profpic); // Default profile picture
-                                    } else {
-                                        Log.d(TAG, "No such document");
-                                        Toast.makeText(HomeActivity.this, "User data not found", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Log.d(TAG, "Error getting document: ", task.getException());
-                                    Toast.makeText(HomeActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+            if (data != null) {
+                TaskModel newTask = (TaskModel) data.getSerializableExtra("newTask");
+                if (newTask != null) {
+                    dataList.add(newTask); // Add new task to the list
+                    taskListAdapter.notifyDataSetChanged(); // Notify adapter of the changes
+                }
             }
         }
     }
@@ -146,37 +167,29 @@ public class HomeActivity extends AppCompatActivity {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         db.collection("tasks")
                 .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException error) {
                         progressBar.setVisibility(View.GONE); // Hide progress bar
-                        if (task.isSuccessful()) {
-                            ArrayList<TaskModel> updatedTaskList = new ArrayList<>();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                TaskModel taskModel = document.toObject(TaskModel.class);
-                                taskModel.setTaskId(document.getId());
-                                updatedTaskList.add(taskModel);
-                            }
-                            // Update adapter with new task list
-                            updateTaskList(updatedTaskList);
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        if (error != null) {
+                            Log.e(TAG, "Error getting documents: ", error);
                             Toast.makeText(HomeActivity.this, "Error getting tasks", Toast.LENGTH_SHORT).show();
+                            return;
                         }
+
+                        dataList.clear(); // Clear existing data
+                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                            TaskModel taskModel = document.toObject(TaskModel.class);
+                            taskModel.setTaskId(document.getId());
+                            dataList.add(taskModel);
+                        }
+                        taskListAdapter.notifyDataSetChanged(); // Notify adapter of changes
                     }
                 });
     }
 
-    // Method to update task list in adapter
-    private void updateTaskList(ArrayList<TaskModel> updatedTaskList) {
-        dataList.clear(); // Clear existing data
-        dataList.addAll(updatedTaskList); // Add updated data
-        taskListAdapter.notifyDataSetChanged(); // Notify adapter of changes
-    }
-
     // Method to show logout menu
-    private void showPopupMenu(View view) {
+    private void showLogoutMenu(View view) {
         PopupMenu popup = new PopupMenu(this, view);
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.logout, popup.getMenu());
@@ -199,4 +212,82 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(new Intent(HomeActivity.this, MainActivity.class)); // Redirect to MainActivity
         finish(); // Finish current activity
     }
+
+    // Implementing TaskListAdapter.OnItemClickListener methods
+    @Override
+    public void onItemClick(TaskModel task, int position) {
+        // Handle click on item to open detailed task page
+        Intent intent = new Intent(HomeActivity.this, TaskDetailActivity.class);
+        intent.putExtra("task", task);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemLongClick(View view, int position) {
+        // Handle long click on task item to show options
+        TaskModel task = dataList.get(position);
+        showTaskOptionsMenu(view, task, position);
+    }
+
+    // Method to show options menu for tasks
+    private void showTaskOptionsMenu(View view, TaskModel task, int position) {
+        PopupMenu popupMenu = new PopupMenu(this, view);
+        MenuInflater inflater = popupMenu.getMenuInflater();
+        inflater.inflate(R.menu.taskmenu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.deleteMenu) {
+                    deleteTask(position); // Delete task if delete menu item clicked
+                    return true;
+                } else if (itemId == R.id.markCompleteMenu) {
+                    markTaskAsCompleted(position); // Mark task as complete if mark complete menu item clicked
+                    return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
+
+    // Method to mark a task as completed
+    private void markTaskAsCompleted(int position) {
+        TaskModel task = dataList.get(position);
+        task.setTaskStatus("Completed");
+        db.collection("tasks").document(task.getTaskId())
+                .update("taskStatus", "Completed")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            taskListAdapter.notifyItemChanged(position); // Notify adapter of the change
+                            Toast.makeText(HomeActivity.this, "Task marked as completed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(HomeActivity.this, "Error marking task as completed", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    // Method to delete a task
+    private void deleteTask(int position) {
+        TaskModel task = dataList.get(position);
+        db.collection("tasks").document(task.getTaskId())
+                .delete()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            dataList.remove(position); // Remove task from the list
+                            taskListAdapter.notifyItemRemoved(position); // Notify adapter of the removal
+                            Toast.makeText(HomeActivity.this, "Task deleted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(HomeActivity.this, "Error deleting task", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 }
+
+

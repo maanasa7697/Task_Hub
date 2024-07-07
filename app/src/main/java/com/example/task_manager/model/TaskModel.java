@@ -1,21 +1,34 @@
 package com.example.task_manager.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-public class TaskModel implements Serializable {
-    String taskId, taskName, taskStatus, userId;
-    Date taskDate;
-    String taskTime;
-    private String date; // Add date field
-    private String day; // Add day field
-    private String Month;
+public class TaskModel implements Parcelable {
+    private String taskId;
+    private String taskName;
+    private String taskStatus;
+    private String userId;
+    private Date taskDate;
+    private String taskTime;
+    private String date;
+    private String day;
+    private String month;
+    private int year;
+    private List<String> attachedFileUris; // List of attached file URIs
+    private List<String> photoUris; // List of photo URIs
 
+    // Default constructor
     public TaskModel() {
-
+        this.attachedFileUris = new ArrayList<>();
+        this.photoUris = new ArrayList<>();
     }
 
-    public TaskModel(String taskId, String taskName, String taskStatus, String userId, Date taskDate, String taskTime, String date, String day, String Month) {
+    // Constructor with fields
+    public TaskModel(String taskId, String taskName, String taskStatus, String userId, Date taskDate, String taskTime, String date, String day, String month, int year, List<String> attachedFileUris, List<String> photoUris) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.taskStatus = taskStatus;
@@ -24,8 +37,39 @@ public class TaskModel implements Serializable {
         this.taskTime = taskTime;
         this.date = date;
         this.day = day;
-        this.Month = Month;
+        this.month = month;
+        this.year = year;
+        this.attachedFileUris = attachedFileUris;
+        this.photoUris = photoUris;
     }
+
+    protected TaskModel(Parcel in) {
+        taskId = in.readString();
+        taskName = in.readString();
+        taskStatus = in.readString();
+        userId = in.readString();
+        long tmpTaskDate = in.readLong();
+        taskDate = tmpTaskDate != -1 ? new Date(tmpTaskDate) : null;
+        taskTime = in.readString();
+        date = in.readString();
+        day = in.readString();
+        month = in.readString();
+        year = in.readInt();
+        attachedFileUris = in.createStringArrayList();
+        photoUris = in.createStringArrayList();
+    }
+
+    public static final Creator<TaskModel> CREATOR = new Creator<TaskModel>() {
+        @Override
+        public TaskModel createFromParcel(Parcel in) {
+            return new TaskModel(in);
+        }
+
+        @Override
+        public TaskModel[] newArray(int size) {
+            return new TaskModel[size];
+        }
+    };
 
     public String getTaskId() {
         return taskId;
@@ -92,10 +136,55 @@ public class TaskModel implements Serializable {
     }
 
     public String getMonth() {
-        return Month;
+        return month;
     }
 
-    public void setMonth(String Month) {
-        this.Month = Month;
+    public void setMonth(String month) {
+        this.month = month;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public List<String> getAttachedFileUris() {
+        return attachedFileUris;
+    }
+
+    public void setAttachedFileUris(List<String> attachedFileUris) {
+        this.attachedFileUris = attachedFileUris;
+    }
+
+    public List<String> getPhotoUris() {
+        return photoUris;
+    }
+
+    public void setPhotoUris(List<String> photoUris) {
+        this.photoUris = photoUris;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(taskId);
+        dest.writeString(taskName);
+        dest.writeString(taskStatus);
+        dest.writeString(userId);
+        dest.writeLong(taskDate != null ? taskDate.getTime() : -1);
+        dest.writeString(taskTime);
+        dest.writeString(date);
+        dest.writeString(day);
+        dest.writeString(month);
+        dest.writeInt(year);
+        dest.writeStringList(attachedFileUris);
+        dest.writeStringList(photoUris);
     }
 }
