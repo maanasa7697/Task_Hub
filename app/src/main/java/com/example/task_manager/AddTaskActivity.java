@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,10 +78,10 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
 
         saveBtn.setOnClickListener(v -> {
             String taskName = etTaskInput.getText().toString().trim();
-            String Day = dayTextView.getText().toString().trim();
-            String Month = monthTextView.getText().toString().trim();
-            String Date = dateTextView.getText().toString().trim();
-            int year = calendar.get(Calendar.YEAR);
+            String day = dayTextView.getText().toString().trim();
+            String month = monthTextView.getText().toString().trim();
+            String date = dateTextView.getText().toString().trim();
+            String time = selectedTimeTextView.getText().toString().trim();
 
             if (!taskName.isEmpty()) {
                 List<String> photoUriStrings = new ArrayList<>();
@@ -94,11 +95,11 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
                         "PENDING", // TaskStatus (assuming default status)
                         FirebaseAuth.getInstance().getUid(), // UserId
                         calendar.getTime(), // TaskDate
-                        selectedTimeTextView.getText().toString(), // TaskTime
-                        Date, // Date
-                        Day, // Day
-                        Month, // Month
-                        year, // Year
+                        time, // TaskTime
+                        date, // Date
+                        day, // Day
+                        month, // Month
+                        calendar.get(Calendar.YEAR), // Year
                         new ArrayList<>(), // Attached file URIs (empty for now)
                         photoUriStrings // List of photo URIs
                 );
@@ -114,6 +115,9 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
             actionBar.setTitle("Add Task");
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        // Create notification channel
+        createNotificationChannel();
     }
 
     private void showDatePickerDialog() {
@@ -147,9 +151,6 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
         calendar.set(Calendar.MINUTE, minute);
 
         selectedTimeTextView.setText(String.format("%02d:%02d", hourOfDay, minute));
-
-        // Schedule notification 1 minute before the task time
-        scheduleNotification(calendar.getTimeInMillis() - 60000); // 1 minute before
     }
 
     private void capturePhoto() {
@@ -194,6 +195,10 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
                     resultIntent.putExtra("newTask", taskModel);
                     setResult(Activity.RESULT_OK, resultIntent);
                     progressBar.setVisibility(View.GONE);
+
+                    // Schedule notification 1 minute before the task time
+                    scheduleNotification(taskModel);
+
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -203,12 +208,29 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
                 });
     }
 
-    private void scheduleNotification(long timeInMillis) {
+    private void scheduleNotification(TaskModel taskModel) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, TaskReminderBroadcast.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        intent.putExtra("taskName", taskModel.getTaskName());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, taskModel.getTaskId().hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent);
+        Calendar notificationTime = Calendar.getInstance();
+        notificationTime.setTime(taskModel.getTaskDate()); // Set the task time
+        notificationTime.add(Calendar.MINUTE, -1); // Schedule notification 1 minute before task time
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, notificationTime.getTimeInMillis(), pendingIntent);
+    }
+
+    private void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            CharSequence name = "Task Manager Channel";
+            String description = "Channel for Task Manager notifications";
+            int importance = android.app.NotificationManager.IMPORTANCE_DEFAULT;
+            android.app.NotificationChannel channel = new android.app.NotificationChannel("task_manager_channel", name, importance);
+            channel.setDescription(description);
+            android.app.NotificationManager notificationManager = getSystemService(android.app.NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     @Override

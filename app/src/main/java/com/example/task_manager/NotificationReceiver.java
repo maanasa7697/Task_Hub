@@ -1,46 +1,27 @@
 package com.example.task_manager;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
-
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationReceiver extends BroadcastReceiver {
-
-    private static final String CHANNEL_ID = "task_reminder_channel";
-    private static final int NOTIFICATION_ID = 123;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String taskName = intent.getStringExtra("taskName");
 
-        createNotificationChannel(context);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "task_manager_channel")
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Task Reminder")
-                .setContentText("Your task '" + taskName + "' is coming up!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setContentText("You have a task: " + taskName + " in 1 minute")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
 
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
-    }
-
-    private void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Task Reminder Channel";
-            String description = "Channel for task reminders";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-
-            NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(taskName.hashCode(), builder.build());
     }
 }
