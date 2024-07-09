@@ -31,15 +31,24 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.task_manager.model.TaskModel;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class AddTaskActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
+public class AddTaskActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, OnMapReadyCallback {
+    private GoogleMap gMap;
 
     private static final int PERMISSION_REQUEST_CAMERA = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
@@ -58,6 +67,9 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
         db = FirebaseFirestore.getInstance();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         selectedDateTextView = findViewById(R.id.selectedDateTextView);
         selectedTimeTextView = findViewById(R.id.selectedTimeTextView);
@@ -172,6 +184,20 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        gMap = googleMap;
+
+        // Customize map settings here
+        LatLng location = new LatLng(13.0843, 80.2705);
+        googleMap.addMarker(new MarkerOptions().position(location).title("Chennai"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12));
+
+        // Example of setting up a click listener on the map
+        googleMap.setOnMapClickListener(latLng -> {
+            // Handle map click events here
+            Toast.makeText(this, "Map clicked at: " + latLng.latitude + ", " + latLng.longitude, Toast.LENGTH_SHORT).show();
+        });
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -254,3 +280,4 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
         return super.onOptionsItemSelected(item);
     }
 }
+

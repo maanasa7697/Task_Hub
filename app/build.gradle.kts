@@ -59,6 +59,11 @@ dependencies {
     implementation("com.github.sundeepk:compact-calendar-view:3.0.0")
     implementation("androidx.core:core:1.7.0")
     implementation("androidx.work:work-runtime:2.7.1")
+    implementation("com.google.android.gms:play-services-maps:18.0.1")
+    implementation("com.google.android.libraries.places:places:3.0.0")
+
+
+
 
 
 

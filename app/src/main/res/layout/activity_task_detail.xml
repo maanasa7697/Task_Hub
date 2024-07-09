@@ -67,6 +67,16 @@
             android:textColor="@android:color/black"
             android:layout_marginBottom="16dp"/>
 
+        <!-- Task Time -->
+        <TextView
+            android:id="@+id/taskTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="16dp"/>
+
         <!-- Captured Images Label -->
         <TextView
             android:id="@+id/imagesLabelTv"

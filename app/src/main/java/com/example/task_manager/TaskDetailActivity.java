@@ -30,7 +30,7 @@ import java.util.List;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
-    private TextView taskNameTv, taskStatusTv, taskDateTextView, taskDayTextView, taskMonthTextView;
+    private TextView taskNameTv, taskStatusTv, taskDateTextView, taskDayTextView, taskMonthTextView, taskTimeTextView;
     private ImageView capturedImageView;
     private Button saveToInternalStorageBtn, loadFromInternalStorageBtn;
 
@@ -58,6 +58,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         capturedImageView = findViewById(R.id.imageView);
         saveToInternalStorageBtn = findViewById(R.id.saveToInternalStorageBtn);
         loadFromInternalStorageBtn = findViewById(R.id.loadFromInternalStorageBtn);
+        taskTimeTextView = findViewById(R.id.taskTimeTextView); // Initialize taskTimeTextView
 
         // Retrieve TaskModel from Intent
         taskModel = getIntent().getParcelableExtra("task");
@@ -69,6 +70,7 @@ public class TaskDetailActivity extends AppCompatActivity {
             taskDateTextView.setText("Date: " + taskModel.getDate());
             taskDayTextView.setText("Day: " + taskModel.getDay());
             taskMonthTextView.setText("Month: " + taskModel.getMonth());
+            taskTimeTextView.setText("Time: " + taskModel.getTaskTime()); // Set task time
 
             // Load captured images if available
             List<String> photoUrls = taskModel.getPhotoUris();
