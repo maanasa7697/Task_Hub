@@ -9,6 +9,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -19,6 +21,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -39,16 +42,26 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 public class AddTaskActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener, OnMapReadyCallback {
-    private GoogleMap gMap;
+    private GoogleMap mMap;
+    private Marker taskMarker;
+    private SearchView searchView;
 
     private static final int PERMISSION_REQUEST_CAMERA = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
@@ -68,8 +81,6 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
         setContentView(R.layout.activity_add_task);
         db = FirebaseFirestore.getInstance();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
 
         selectedDateTextView = findViewById(R.id.selectedDateTextView);
         selectedTimeTextView = findViewById(R.id.selectedTimeTextView);
@@ -80,6 +91,7 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
         saveBtn = findViewById(R.id.taskSave);
         capturePhotoBtn = findViewById(R.id.capturePhotoBtn);
         progressBar = findViewById(R.id.progress);
+        searchView = findViewById(R.id.searchView);
 
         calendar = Calendar.getInstance();
         photoUris = new ArrayList<>();
@@ -130,7 +142,69 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
 
         // Create notification channel
         createNotificationChannel();
+
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchLocation(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        // Initialize Places
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "YOUR_API_KEY");
+        }
+
+        // Initialize the map
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+
+        // Set a map click listener
+        mMap.setOnMapClickListener(latLng -> {
+            if (taskMarker != null) {
+                taskMarker.remove();
+            }
+            taskMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Task Location"));
+        });
+    }
+
+    private void searchLocation(String location) {
+        List<Address> addressList = null;
+        if (location != null || !location.equals("")) {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                addressList = geocoder.getFromLocationName(location, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (addressList != null && !addressList.isEmpty()) {
+                Address address = addressList.get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                if (taskMarker != null) {
+                    taskMarker.remove();
+                }
+                taskMarker = mMap.addMarker(new MarkerOptions().position(latLng).title("Task Location"));
+            } else {
+                Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
 
     private void showDatePickerDialog() {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
@@ -183,20 +257,6 @@ public class AddTaskActivity extends AppCompatActivity implements TimePickerDial
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, currentPhotoUri);
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
-    }
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        gMap = googleMap;
-
-        // Customize map settings here
-        LatLng location = new LatLng(13.0843, 80.2705);
-        googleMap.addMarker(new MarkerOptions().position(location).title("Chennai"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12));
-
-        // Example of setting up a click listener on the map
-        googleMap.setOnMapClickListener(latLng -> {
-            // Handle map click events here
-            Toast.makeText(this, "Map clicked at: " + latLng.latitude + ", " + latLng.longitude, Toast.LENGTH_SHORT).show();
-        });
     }
 
     @Override

@@ -47,6 +47,34 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.signin).setOnClickListener(new View.OnClickListener() {
             @Override
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             public void onClick(View v) {
                 signIn();
             }

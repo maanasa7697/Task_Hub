@@ -15,4 +15,7 @@
     <color name="secondaryVariant">#FFA000</color>
     <color name="onSecondary">#000000</color>
     <color name="detail">#C1E8FF</color>
+    <color name="colorPrimary">#006241</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
 </resources>
