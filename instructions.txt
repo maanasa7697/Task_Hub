@@ -1,0 +1,3 @@
+The firebase console is saved in 2013711058023@mopvaishnav.ac.in
+The github is stored in maansa7697@gmail.com
+Make sure to give firebase database permission whenever you want it.
